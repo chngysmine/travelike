@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/app_spacing.dart';
+import '../../core/widgets/glass_container.dart';
+import '../../core/widgets/app_back_button.dart';
+import '../../core/utils/app_animations.dart';
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key});
@@ -17,154 +20,293 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: const Color(0xFF141416), // Premium Dark
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20), onPressed: () => Navigator.pop(context)),
-        title: Text('Credit Card Details', style: GoogleFonts.playfairDisplay(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white)),
+        leading: const Padding(
+           padding: EdgeInsets.only(left: 10),
+           child: AppBackButton(
+             iconColor: Colors.white,
+             backgroundColor: Colors.white12,
+           ),
+        ),
+        title: Text('Checkout', style: AppTextStyles.displayMedium.white),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: AppSpacing.screen,
+        physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Payment Method
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(border: Border.all(color: Colors.white.withValues(alpha: 0.2), style: BorderStyle.solid), borderRadius: BorderRadius.circular(16)),
+            // ==================== ORDER SUMMARY ====================
+            Text('Order Summary', style: AppTextStyles.titleMedium.white70).fadeInUp(),
+            AppSpacing.vLg,
+            GlassContainer.dark(
+              borderRadius: 24,
+              padding: const EdgeInsets.all(20),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Payment\nMethod', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.7))),
-                  const SizedBox(height: 12),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _PaymentChip(label: '💳', isSelected: _selectedMethod == 0, onTap: () => setState(() => _selectedMethod = 0)),
-                      const SizedBox(width: 12),
-                      _PaymentChip(label: '🅿️', isSelected: _selectedMethod == 1, onTap: () => setState(() => _selectedMethod = 1)),
-                      const SizedBox(width: 12),
-                      _PaymentChip(label: '🍎', isSelected: _selectedMethod == 2, onTap: () => setState(() => _selectedMethod = 2)),
-                      const SizedBox(width: 12),
-                      _PaymentChip(label: '🔵', isSelected: _selectedMethod == 3, onTap: () => setState(() => _selectedMethod = 3)),
+                      Text('Vietnam Airlines Flight', style: AppTextStyles.titleMedium.white),
+                      Text('\$120.00', style: AppTextStyles.titleMedium.white),
+                    ],
+                  ),
+                  AppSpacing.vMd,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Taxes & Fees', style: AppTextStyles.labelMedium.white70),
+                      Text('\$15.50', style: AppTextStyles.labelMedium.white70),
+                    ],
+                  ),
+                  AppSpacing.vLg,
+                  const Divider(color: Colors.white12, height: 1),
+                  AppSpacing.vLg,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Total', style: AppTextStyles.titleLarge.white),
+                      Text('\$135.50', style: AppTextStyles.price.copyWith(color: AppColors.accentGold)),
                     ],
                   ),
                 ],
               ),
-            ).animate().fadeIn(duration: 400.ms),
-            const SizedBox(height: 28),
-            _buildField('Name on card', 'Meet Patel', Iconsax.user).animate().fadeIn(duration: 400.ms, delay: 100.ms),
-            const SizedBox(height: 20),
-            _buildField('Card number', '0000 0000 0000 0000', Iconsax.card).animate().fadeIn(duration: 400.ms, delay: 200.ms),
-            const SizedBox(height: 20),
-            Row(children: [
-              Expanded(child: _buildDropdown('Month', Iconsax.calendar_1)),
-              const SizedBox(width: 12),
-              Expanded(child: _buildDropdown('Year', Iconsax.calendar_1)),
-            ]).animate().fadeIn(duration: 400.ms, delay: 300.ms),
-            const SizedBox(height: 20),
-            _buildField('Card Security Code', 'Code', Iconsax.lock).animate().fadeIn(duration: 400.ms, delay: 400.ms),
-            const SizedBox(height: 40),
+            ).fadeInUp(delay: const Duration(milliseconds: 50)),
+            
+            AppSpacing.vXxl,
+            AppSpacing.vMd,
+
+            // ==================== PAYMENT METHODS ====================
+            Text('Payment Method', style: AppTextStyles.titleMedium.white70).fadeInUp(delay: const Duration(milliseconds: 100)),
+            AppSpacing.vLg,
+            
+            _PaymentMethodCard(
+              title: 'Apple Pay',
+              icon: Icons.apple_rounded,
+              index: 0,
+              selectedIndex: _selectedMethod,
+              onTap: () => setState(() => _selectedMethod = 0),
+            ).fadeInUp(delay: const Duration(milliseconds: 150)),
+            
+            _PaymentMethodCard(
+              title: 'Credit Card',
+              icon: Iconsax.card,
+              index: 1,
+              selectedIndex: _selectedMethod,
+              onTap: () => setState(() => _selectedMethod = 1),
+              isExpanded: _selectedMethod == 1,
+            ).fadeInUp(delay: const Duration(milliseconds: 200)),
+            
+            _PaymentMethodCard(
+              title: 'MoMo E-Wallet',
+              icon: Icons.account_balance_wallet_rounded,
+              index: 2,
+              selectedIndex: _selectedMethod,
+              onTap: () => setState(() => _selectedMethod = 2),
+            ).fadeInUp(delay: const Duration(milliseconds: 250)),
+
+            AppSpacing.vXxl,
+            AppSpacing.vXxl,
+
+            // ==================== CHECKOUT BUTTON ====================
             SizedBox(
-              width: double.infinity, height: 56,
+              width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => _showPaymentSuccess(context),
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
-                child: Text('Pay', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white)),
+                onPressed: () {
+                  _showSuccessDialog(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                ),
+                child: Text('Pay \$135.50', style: AppTextStyles.titleMedium.white),
               ),
-            ).animate().fadeIn(duration: 400.ms, delay: 500.ms).slideY(begin: 0.1, end: 0),
+            ).fadeInUp(delay: const Duration(milliseconds: 300)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildField(String label, String hint, IconData icon) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.8))),
-        const SizedBox(height: 8),
-        TextField(
-          style: GoogleFonts.inter(color: Colors.white),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.3)),
-            prefixIcon: Icon(icon, color: Colors.white.withValues(alpha: 0.5), size: 20),
-            filled: true, fillColor: Colors.white.withValues(alpha: 0.08),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.15))),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.15))),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.primary)),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDropdown(String hint, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: Colors.white.withValues(alpha: 0.15))),
-      child: Row(children: [
-        Text(hint, style: GoogleFonts.inter(fontSize: 14, color: Colors.white.withValues(alpha: 0.3))),
-        const Spacer(),
-        Icon(Icons.keyboard_arrow_down, color: Colors.white.withValues(alpha: 0.5)),
-      ]),
-    );
-  }
-
-  void _showPaymentSuccess(BuildContext context) {
+  void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Padding(
+      barrierColor: Colors.black87,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: GlassContainer.dark(
           padding: const EdgeInsets.all(32),
+          borderRadius: 32,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 80, height: 80,
-                decoration: BoxDecoration(color: AppColors.chipGreen.withValues(alpha: 0.15), shape: BoxShape.circle),
-                child: const Icon(Icons.check_circle, color: AppColors.chipGreen, size: 48),
-              ).animate().scale(begin: const Offset(0.5, 0.5), duration: 400.ms, curve: Curves.elasticOut),
-              const SizedBox(height: 20),
-              Text('Payment Successful!', style: GoogleFonts.playfairDisplay(fontSize: 22, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 8),
-              Text('Your booking has been confirmed.\nEnjoy your trip! 🎉', textAlign: TextAlign.center, style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary, height: 1.5)),
-              const SizedBox(height: 24),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.chipGreen.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Iconsax.tick_circle, color: AppColors.chipGreen, size: 48),
+              ).fadeInScale(),
+              AppSpacing.vXxl,
+              Text('Payment Successful!', style: AppTextStyles.displayMedium.white),
+              AppSpacing.vLg,
+              Text(
+                'Your flight has been booked successfully. E-ticket has been sent to your email.',
+                textAlign: TextAlign.center,
+                style: AppTextStyles.bodyMedium.white70,
+              ),
+              AppSpacing.vXxl,
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () { Navigator.pop(context); Navigator.pop(context); },
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-                  child: Text('Done', style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: Colors.white)),
+                  onPressed: () {
+                    Navigator.pop(context); // Close dialog
+                    Navigator.pop(context); // Go back
+                  },
+                  child: const Text('Back to Home'),
                 ),
               ),
             ],
           ),
-        ),
+        ).fadeInUp(),
       ),
     );
   }
 }
 
-class _PaymentChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
+class _PaymentMethodCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final int index;
+  final int selectedIndex;
   final VoidCallback onTap;
-  const _PaymentChip({required this.label, required this.isSelected, required this.onTap});
+  final bool isExpanded;
+
+  const _PaymentMethodCard({
+    required this.title,
+    required this.icon,
+    required this.index,
+    required this.selectedIndex,
+    required this.onTap,
+    this.isExpanded = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final isSelected = index == selectedIndex;
+    
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: isSelected ? AppColors.primary.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12), border: Border.all(color: isSelected ? AppColors.primary : Colors.transparent, width: 2)),
-        child: Text(label, style: const TextStyle(fontSize: 24)),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : Colors.white12,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: isSelected ? AppColors.primary : Colors.white, size: 28),
+                AppSpacing.hLg,
+                Expanded(child: Text(title, style: AppTextStyles.titleMedium.white)),
+                Container(
+                  width: 24, height: 24,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: isSelected ? AppColors.primary : Colors.white54, width: 2),
+                  ),
+                  child: isSelected
+                      ? Center(child: Container(width: 12, height: 12, decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.primary)))
+                      : null,
+                ),
+              ],
+            ),
+            if (isExpanded) ...[
+              AppSpacing.vLg,
+              const Divider(color: Colors.white12, height: 1),
+              AppSpacing.vLg,
+              Container(
+                height: 56,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(16)),
+                child: Row(
+                  children: [
+                    const Icon(Icons.credit_card_rounded, color: Colors.white54, size: 20),
+                    AppSpacing.hMd,
+                    Expanded(
+                      child: TextField(
+                        style: AppTextStyles.titleMedium.white,
+                        decoration: InputDecoration(
+                          hintText: 'Card Number',
+                          hintStyle: AppTextStyles.titleMedium.white70,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          fillColor: Colors.transparent,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              AppSpacing.vMd,
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 56,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(16)),
+                      child: TextField(
+                        style: AppTextStyles.titleMedium.white,
+                        decoration: InputDecoration(
+                          hintText: 'MM/YY',
+                          hintStyle: AppTextStyles.titleMedium.white70,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          fillColor: Colors.transparent,
+                        ),
+                      ),
+                    ),
+                  ),
+                  AppSpacing.hMd,
+                  Expanded(
+                    child: Container(
+                      height: 56,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(16)),
+                      child: TextField(
+                        style: AppTextStyles.titleMedium.white,
+                        decoration: InputDecoration(
+                          hintText: 'CVC',
+                          hintStyle: AppTextStyles.titleMedium.white70,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          fillColor: Colors.transparent,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

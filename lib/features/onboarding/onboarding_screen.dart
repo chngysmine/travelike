@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/theme/app_colors.dart';
-import '../auth/login_screen.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/app_spacing.dart';
+import '../../core/widgets/glass_container.dart';
+import '../../core/utils/page_transitions.dart';
+import '../../core/utils/app_animations.dart';
+import '../auth/signin_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -13,46 +17,46 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  final PageController _controller = PageController();
-  int _currentPage = 0;
+  final PageController _pageController = PageController();
+  int _currentIndex = 0;
 
-  final List<_OnboardingData> _pages = [
-    _OnboardingData(
-      image: 'https://images.unsplash.com/photo-1555921015-5532091f6026?w=1200',
-      title: 'Discover Vietnam',
-      subtitle: 'From the lanterns of Hoi An to the peaks of Sa Pa,\nexplore every corner of this beautiful country',
-      emoji: '🏮',
-    ),
-    _OnboardingData(
-      image: 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=1200',
-      title: 'Taste the Culture',
-      subtitle: 'Savor authentic Vietnamese cuisine,\nfrom street food to fine dining experiences',
-      emoji: '🍜',
-    ),
-    _OnboardingData(
-      image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=1200',
-      title: 'Plan Your Journey',
-      subtitle: 'Book flights, tours, and hotels.\nAll in one place, all for you',
-      emoji: '✈️',
-    ),
+  final List<Map<String, String>> _pages = [
+    {
+      'title': 'Discover Vietnam',
+      'desc': 'Explore hidden gems, majestic landscapes, and breathtaking views across the country.',
+      'image': 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=800&auto=format&fit=crop', // Halong Bay
+    },
+    {
+      'title': 'Taste the Culture',
+      'desc': 'Indulge in authentic Vietnamese cuisine and discover flavors that tell a story.',
+      'image': 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?q=80&w=800&auto=format&fit=crop', // Pho
+    },
+    {
+      'title': 'Seamless Travel',
+      'desc': 'Book flights, hotels, and tours all in one place with a single tap.',
+      'image': 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=800&auto=format&fit=crop', // Hoi An
+    },
   ];
-
-  void _navigateToLogin() {
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const LoginScreen(),
-        transitionDuration: const Duration(milliseconds: 600),
-        transitionsBuilder: (_, animation, __, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-      ),
-    );
-  }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _pageController.dispose();
     super.dispose();
+  }
+
+  void _nextPage() {
+    if (_currentIndex < _pages.length - 1) {
+      _pageController.animateToPage(
+        _currentIndex + 1,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOutCubic,
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        PageTransitions.fadeScale(const SigninScreen()),
+      );
+    }
   }
 
   @override
@@ -60,35 +64,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
-        fit: StackFit.expand,
         children: [
-          // Page View
+          // ==================== BACKGROUND PAGER ====================
           PageView.builder(
-            controller: _controller,
+            controller: _pageController,
+            onPageChanged: (index) => setState(() => _currentIndex = index),
             itemCount: _pages.length,
-            onPageChanged: (index) => setState(() => _currentPage = index),
             itemBuilder: (context, index) {
-              final page = _pages[index];
               return Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Image
-                  Image.network(
-                    page.image,
+                  CachedNetworkImage(
+                    imageUrl: _pages[index]['image']!,
                     fit: BoxFit.cover,
                   ),
-                  // Gradient overlay
-                  Container(
+                  DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withValues(alpha: 0.3),
-                          Colors.black.withValues(alpha: 0.85),
-                        ],
-                        stops: const [0.2, 0.5, 1.0],
+                        colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
+                        stops: const [0.4, 1.0],
                       ),
                     ),
                   ),
@@ -97,162 +93,101 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             },
           ),
 
-          // Bottom Content
+          // ==================== SKIP BUTTON ====================
           Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(28),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Emoji
-                    Text(
-                      _pages[_currentPage].emoji,
-                      style: const TextStyle(fontSize: 40),
-                    ).animate(key: ValueKey(_currentPage))
-                      .fadeIn(duration: 400.ms)
-                      .scale(begin: const Offset(0.5, 0.5)),
+            top: MediaQuery.of(context).padding.top + 20,
+            right: 20,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  PageTransitions.fadeScale(const SigninScreen()),
+                );
+              },
+              child: GlassContainer.dark(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                borderRadius: 20,
+                child: Text('Skip', style: AppTextStyles.labelMedium.white),
+              ),
+            ),
+          ).fadeInUp(),
 
-                    const SizedBox(height: 16),
-
-                    // Title
-                    Text(
-                      _pages[_currentPage].title,
-                      style: GoogleFonts.playfairDisplay(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        height: 1.2,
-                      ),
-                    ).animate(key: ValueKey('title_$_currentPage'))
-                      .fadeIn(duration: 500.ms, delay: 100.ms)
-                      .slideX(begin: 0.1, end: 0),
-
-                    const SizedBox(height: 12),
-
-                    // Subtitle
-                    Text(
-                      _pages[_currentPage].subtitle,
-                      style: GoogleFonts.inter(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white.withValues(alpha: 0.8),
-                        height: 1.6,
-                      ),
-                    ).animate(key: ValueKey('sub_$_currentPage'))
-                      .fadeIn(duration: 500.ms, delay: 200.ms)
-                      .slideX(begin: 0.1, end: 0),
-
-                    const SizedBox(height: 40),
-
-                    // Dots + Button Row
-                    Row(
-                      children: [
-                        SmoothPageIndicator(
-                          controller: _controller,
-                          count: _pages.length,
-                          effect: ExpandingDotsEffect(
-                            activeDotColor: AppColors.accentGold,
-                            dotColor: Colors.white.withValues(alpha: 0.3),
-                            dotHeight: 8,
-                            dotWidth: 8,
-                            expansionFactor: 3,
-                            spacing: 6,
-                          ),
+          // ==================== BOTTOM CONTENT ====================
+          Positioned(
+            bottom: 40,
+            left: 20,
+            right: 20,
+            child: GlassContainer.dark(
+              padding: const EdgeInsets.all(32),
+              borderRadius: 32,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Indicators
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      _pages.length,
+                      (index) => AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: _currentIndex == index ? 24 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: _currentIndex == index ? AppColors.primary : Colors.white24,
+                          borderRadius: BorderRadius.circular(4),
                         ),
-                        const Spacer(),
-                        // Next / Get Started Button
-                        GestureDetector(
-                          onTap: () {
-                            if (_currentPage < _pages.length - 1) {
-                              _controller.nextPage(
-                                duration: const Duration(milliseconds: 400),
-                                curve: Curves.easeInOut,
-                              );
-                            } else {
-                              _navigateToLogin();
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: _currentPage == _pages.length - 1 ? 28 : 20,
-                              vertical: 14,
-                            ),
-                            decoration: BoxDecoration(
-                              gradient: AppColors.primaryGradient,
-                              borderRadius: BorderRadius.circular(30),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.4),
-                                  blurRadius: 16,
-                                  offset: const Offset(0, 6),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  _currentPage == _pages.length - 1
-                                      ? 'Explorer Now'
-                                      : 'Next',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Icon(Icons.arrow_forward_rounded,
-                                    color: Colors.white, size: 18),
-                              ],
-                            ),
-                          ),
+                      ),
+                    ),
+                  ),
+                  
+                  AppSpacing.vXxl,
+
+                  // Text animated automatically smoothly using AnimatedSwitcher
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 400),
+                    child: Column(
+                      key: ValueKey<int>(_currentIndex),
+                      children: [
+                        Text(
+                          _pages[_currentIndex]['title']!,
+                          style: AppTextStyles.displayMedium.white,
+                          textAlign: TextAlign.center,
+                        ),
+                        AppSpacing.vLg,
+                        Text(
+                          _pages[_currentIndex]['desc']!,
+                          style: AppTextStyles.bodyMedium.white70,
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
+                  ),
 
-                    // Skip button
-                    if (_currentPage < _pages.length - 1) ...[
-                      const SizedBox(height: 20),
-                      Center(
-                        child: TextButton(
-                          onPressed: _navigateToLogin,
-                          child: Text(
-                            'Skip',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              color: Colors.white.withValues(alpha: 0.5),
-                              letterSpacing: 1,
-                            ),
-                          ),
-                        ),
+                  AppSpacing.vXxl,
+
+                  // Start button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: _nextPage,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       ),
-                    ],
-                  ],
-                ),
+                      child: Text(
+                        _currentIndex == _pages.length - 1 ? 'Get Started' : 'Next',
+                        style: AppTextStyles.titleMedium.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
+            ).animate().slideY(begin: 0.1, end: 0, duration: 600.ms, curve: Curves.easeOutCubic).fadeIn(duration: 600.ms),
           ),
         ],
       ),
     );
   }
-}
-
-class _OnboardingData {
-  final String image;
-  final String title;
-  final String subtitle;
-  final String emoji;
-
-  _OnboardingData({
-    required this.image,
-    required this.title,
-    required this.subtitle,
-    required this.emoji,
-  });
 }

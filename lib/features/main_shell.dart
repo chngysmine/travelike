@@ -3,7 +3,7 @@ import '../core/widgets/custom_bottom_nav.dart';
 import '../core/widgets/gradient_background.dart';
 import 'home/home_screen.dart';
 import 'reels/reels_screen.dart';
-import 'saved/saved_screen.dart';
+import 'social/create_post_screen.dart';
 import 'weather/weather_screen.dart';
 import 'profile/profile_screen.dart';
 
@@ -20,7 +20,7 @@ class _MainShellState extends State<MainShell> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const ReelsScreen(),
-    const SavedScreen(),
+    const CreatePostScreen(),
     const WeatherScreen(),
     const ProfileScreen(),
   ];

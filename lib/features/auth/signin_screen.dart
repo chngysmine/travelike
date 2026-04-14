@@ -1,289 +1,221 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/widgets/gradient_background.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/app_spacing.dart';
+import '../../core/widgets/glass_container.dart';
+import '../../core/utils/app_animations.dart';
+import '../../core/utils/page_transitions.dart';
 import '../main_shell.dart';
+import 'signup_screen.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class SigninScreen extends StatefulWidget {
+  const SigninScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<SigninScreen> createState() => _SigninScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
-  bool _obscurePassword = true;
-  final _emailController = TextEditingController(text: 'chaungn@gmail.com');
-  final _passwordController = TextEditingController(text: 'password123');
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  void _signIn() {
-    Navigator.of(context).pushAndRemoveUntil(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const MainShell(),
-        transitionDuration: const Duration(milliseconds: 600),
-        transitionsBuilder: (_, animation, __, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-      ),
-      (route) => false,
-    );
-  }
+class _SigninScreenState extends State<SigninScreen> {
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
-    return GradientBackground(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            onPressed: () => Navigator.pop(context),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // ==================== BACKGROUND ====================
+          CachedNetworkImage(
+            imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=800&auto=format&fit=crop', // Halong Bay
+            fit: BoxFit.cover,
           ),
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-
-              Text(
-                'Sign in',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 36,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
-              ).animate().fadeIn(duration: 400.ms).slideX(begin: -0.1, end: 0),
-
-              const SizedBox(height: 8),
-
-              Text(
-                'Welcome back! Please enter your details',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                ),
-              ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
-
-              const SizedBox(height: 40),
-
-              // Email field
-              _buildLabel('Email address'),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Iconsax.sms, color: AppColors.textTertiary, size: 20),
-                  hintText: 'abc@email.com',
-                ),
-              ).animate().fadeIn(duration: 400.ms, delay: 200.ms),
-
-              const SizedBox(height: 24),
-
-              // Password field
-              _buildLabel('Your password'),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Iconsax.lock, color: AppColors.textTertiary, size: 20),
-                  hintText: 'Enter your password',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Iconsax.eye_slash : Iconsax.eye,
-                      color: AppColors.textTertiary,
-                      size: 20,
-                    ),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                  ),
-                ),
-              ).animate().fadeIn(duration: 400.ms, delay: 300.ms),
-
-              const SizedBox(height: 16),
-
-              // Remember me + Forgot
-              Row(
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.black.withValues(alpha: 0.3), Colors.black.withValues(alpha: 0.85)],
+              ),
+            ),
+          ),
+          
+          // ==================== CONTENT ====================
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
                 children: [
-                  SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: Checkbox(
-                      value: true,
-                      onChanged: (_) {},
-                      activeColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text('Remember me', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Forgot Password?',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                ],
-              ).animate().fadeIn(duration: 400.ms, delay: 400.ms),
+                  AppSpacing.vXxl, // Pushes content down a bit
+                  
+                  // Header
+                  Text('Welcome Back', style: AppTextStyles.hero.copyWith(color: Colors.white)).fadeInUp(),
+                  AppSpacing.vSm,
+                  Text('Sign in to continue your adventure.', style: AppTextStyles.bodyMedium.white70).fadeInUp(delay: 100.ms),
+                  
+                  AppSpacing.vXxl,
 
-              const SizedBox(height: 32),
+                  // ==================== SIGNIN FORM CARD ====================
+                  GlassContainer.dark(
+                    padding: const EdgeInsets.all(24),
+                    borderRadius: 32,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        _buildInputField(
+                          hint: 'Email Address',
+                          icon: Iconsax.sms,
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        AppSpacing.vLg,
+                        _buildInputField(
+                          hint: 'Password',
+                          icon: Iconsax.lock,
+                          obscureText: _obscureText,
+                          suffixIcon: GestureDetector(
+                            onTap: () => setState(() => _obscureText = !_obscureText),
+                            child: Icon(
+                              _obscureText ? Iconsax.eye_slash : Iconsax.eye,
+                              color: Colors.white70,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        AppSpacing.vMd,
+                        Text('Forgot Password?', style: AppTextStyles.labelMedium.white70),
+                        
+                        AppSpacing.vXxl,
 
-              // Sign in button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: _signIn,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                        // Login Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                PageTransitions.fadeScale(const MainShell()),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            ),
+                            child: Text('Sign In', style: AppTextStyles.titleMedium.white),
+                          ),
+                        ),
+                      ],
                     ),
-                    elevation: 4,
-                    shadowColor: AppColors.primary.withValues(alpha: 0.4),
-                  ),
-                  child: Row(
+                  ).fadeInUp(delay: 200.ms),
+
+                  AppSpacing.vXxl,
+
+                  // ==================== SOCIAL LOGIN ====================
+                  Row(
+                    children: [
+                      const Expanded(child: Divider(color: Colors.white24)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text('Or continue with', style: AppTextStyles.labelMedium.white70),
+                      ),
+                      const Expanded(child: Divider(color: Colors.white24)),
+                    ],
+                  ).fadeInUp(delay: 300.ms),
+
+                  AppSpacing.vLg,
+
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'SIGN IN',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 20),
+                      _SocialButton(icon: Icons.g_mobiledata_rounded, delay: 350),
+                      AppSpacing.hLg,
+                      _SocialButton(icon: Icons.apple_rounded, delay: 400),
+                      AppSpacing.hLg,
+                      _SocialButton(icon: Icons.facebook_rounded, delay: 450),
                     ],
                   ),
-                ),
-              ).animate().fadeIn(duration: 400.ms, delay: 500.ms).slideY(begin: 0.2, end: 0),
 
-              const SizedBox(height: 28),
+                  AppSpacing.vXxl,
+                  AppSpacing.vXxl,
 
-              // OR divider
-              Row(
-                children: [
-                  Expanded(child: Divider(color: Colors.grey.shade300)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('OR', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textTertiary)),
-                  ),
-                  Expanded(child: Divider(color: Colors.grey.shade300)),
-                ],
-              ),
-
-              const SizedBox(height: 28),
-
-              // Social login
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _SocialButton(icon: '🔵', label: 'Google', onTap: _signIn),
-                  const SizedBox(width: 16),
-                  _SocialButton(icon: '🍎', label: 'Apple', onTap: _signIn),
-                  const SizedBox(width: 16),
-                  _SocialButton(icon: '📘', label: 'Facebook', onTap: _signIn),
-                ],
-              ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
-
-              const SizedBox(height: 32),
-
-              // Sign up link
-              Center(
-                child: RichText(
-                  text: TextSpan(
-                    style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary),
+                  // ==================== SIGN UP LINK ====================
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const TextSpan(text: "Don't have an account? "),
-                      TextSpan(
-                        text: 'Sign Up',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
-                        ),
+                      Text('Don\'t have an account? ', style: AppTextStyles.bodyMedium.white70),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            PageTransitions.fadeScale(const SignupScreen()),
+                          );
+                        },
+                        child: Text('Sign Up', style: AppTextStyles.titleMedium.primary),
                       ),
                     ],
-                  ),
-                ),
-              ),
+                  ).fadeInUp(delay: 500.ms),
 
-              const SizedBox(height: 32),
-            ],
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  Widget _buildLabel(String text) {
-    return Text(
-      text,
-      style: GoogleFonts.inter(
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-        color: AppColors.textPrimary,
+  Widget _buildInputField({
+    required String hint,
+    required IconData icon,
+    bool obscureText = false,
+    Widget? suffixIcon,
+    TextInputType? keyboardType,
+  }) {
+    return TextField(
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      style: AppTextStyles.titleMedium.white,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: AppTextStyles.titleMedium.white70,
+        prefixIcon: Icon(icon, color: Colors.white70, size: 22),
+        suffixIcon: suffixIcon,
+        filled: true,
+        fillColor: Colors.black26, 
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Colors.white24, width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
       ),
     );
   }
 }
 
 class _SocialButton extends StatelessWidget {
-  final String icon;
-  final String label;
-  final VoidCallback onTap;
+  final IconData icon;
+  final int delay;
 
-  const _SocialButton({required this.icon, required this.label, required this.onTap});
+  const _SocialButton({required this.icon, required this.delay});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 90,
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Text(icon, style: const TextStyle(fontSize: 24)),
-            const SizedBox(height: 4),
-            Text(label, style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary)),
-          ],
-        ),
-      ),
-    );
+    return GlassContainer.dark(
+      padding: const EdgeInsets.all(16),
+      borderRadius: 16,
+      child: Icon(icon, color: Colors.white, size: 32),
+    ).fadeInUp(delay: Duration(milliseconds: delay));
   }
 }

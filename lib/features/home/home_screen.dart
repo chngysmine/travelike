@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/app_spacing.dart';
+import '../../core/widgets/app_search_bar.dart';
+import '../../core/widgets/section_header.dart';
+import '../../core/widgets/category_chips.dart';
+import '../../core/widgets/glass_container.dart';
+import '../../core/utils/app_animations.dart';
 import '../../core/utils/page_transitions.dart';
 import '../../data/mock_data.dart';
 import '../events/events_screen.dart';
 import '../food/local_dishup_screen.dart';
-import '../blog/blog_list_screen.dart';
-import '../attractions/attraction_detail_screen.dart';
 import '../flights/book_flight_screen.dart';
-import '../social/message_screen.dart';
 import '../hotels/hotel_list_screen.dart';
 import '../tours/tour_list_screen.dart';
 import '../currency/currency_screen.dart';
-import '../search/search_screen.dart';
-import '../notifications/notification_screen.dart';
+import '../blog/blog_list_screen.dart';
 import '../region/region_screen.dart';
+import '../search/search_screen.dart';
+import '../social/message_screen.dart';
+import '../notifications/notification_screen.dart';
+import '../attractions/attraction_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,345 +39,621 @@ class _HomeScreenState extends State<HomeScreen> {
     return SafeArea(
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              _buildHeader().animate().fadeIn(duration: 400.ms),
-              const SizedBox(height: 20),
-              _buildSearchBar().animate().fadeIn(duration: 400.ms, delay: 100.ms),
-              const SizedBox(height: 20),
-              _buildCategories().animate().fadeIn(duration: 400.ms, delay: 200.ms),
-              const SizedBox(height: 24),
-              _buildSectionHeader('Your Location', 'See all', () => Navigator.push(context, PageTransitions.slideRight(const RegionScreen()))),
-              const SizedBox(height: 16),
-              _buildLocationCarousel().animate().fadeIn(duration: 500.ms, delay: 300.ms),
-              const SizedBox(height: 28),
-              _buildSectionHeader('Quick Access', '', () {}),
-              const SizedBox(height: 16),
-              _buildQuickAccessGrid().animate().fadeIn(duration: 500.ms, delay: 400.ms),
-              const SizedBox(height: 28),
-              _buildSectionHeader('Popular Destinations', 'See all', () => Navigator.push(context, PageTransitions.slideRight(const RegionScreen()))),
-              const SizedBox(height: 16),
-              _buildDestinationsList().animate().fadeIn(duration: 500.ms, delay: 500.ms),
-              const SizedBox(height: 28),
-              _buildSectionHeader('Upcoming Events', 'See all', () => Navigator.push(context, PageTransitions.slideRight(const EventsScreen()))),
-              const SizedBox(height: 16),
-              _buildEventsPreview().animate().fadeIn(duration: 500.ms, delay: 600.ms),
-              const SizedBox(height: 100),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ==================== HEADER ====================
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hi, ${MockData.userName} 👋',
+                          style: AppTextStyles.displayMedium,
+                        ),
+                        AppSpacing.vXs,
+                        Text(
+                          'Where do you want to go?',
+                          style: AppTextStyles.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Message icon
+                  GestureDetector(
+                    onTap: () => Navigator.push(context, PageTransitions.slideRight(const MessageScreen())),
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: AppSpacing.borderMd,
+                        boxShadow: AppSpacing.shadowSm,
+                      ),
+                      child: const Center(child: Icon(Iconsax.message, size: 22, color: AppColors.textPrimary)),
+                    ),
+                  ),
+                  AppSpacing.hSm,
+                  // Notification bell
+                  GestureDetector(
+                    onTap: () => Navigator.push(context, PageTransitions.slideRight(const NotificationScreen())),
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: AppSpacing.borderMd,
+                        boxShadow: AppSpacing.shadowSm,
+                      ),
+                      child: Stack(
+                        children: [
+                          const Center(child: Icon(Iconsax.notification, size: 22, color: AppColors.textPrimary)),
+                          Positioned(
+                            top: 10,
+                            right: 10,
+                            child: Container(
+                              width: 8,
+                              height: 8,
+                              decoration: const BoxDecoration(
+                                color: AppColors.accentRed,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  AppSpacing.hSm,
+                  // Avatar
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      borderRadius: AppSpacing.borderMd,
+                      border: Border.all(color: AppColors.primary, width: 2),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: CachedNetworkImage(
+                        imageUrl: MockData.userAvatar,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ).fadeInUp(),
+
+            AppSpacing.vLg,
+
+            // ==================== SEARCH BAR ====================
+            Padding(
+              padding: AppSpacing.screenH,
+              child: AppSearchBar(
+                hintText: 'Search destinations, food, events...',
+                showFilter: true,
+                onTap: () => Navigator.push(context, PageTransitions.fadeScale(const SearchScreen())),
+                onFilterTap: () => Navigator.push(context, PageTransitions.slideRight(const RegionScreen())),
+              ),
+            ).fadeInUp(index: 1),
+
+            AppSpacing.vXxl,
+
+            // ==================== QUICK ACCESS GRID ====================
+            SectionHeader(
+              title: 'Quick Access',
+              padding: AppSpacing.screenH,
+            ).fadeInUp(index: 2),
+
+            AppSpacing.vMd,
+
+            Padding(
+              padding: AppSpacing.screenH,
+              child: Row(
+                children: [
+                  _QuickAccessItem(
+                    icon: Iconsax.airplane,
+                    label: 'Flights',
+                    color: const Color(0xFF3B82F6),
+                    onTap: () => Navigator.push(context, PageTransitions.slideRight(const BookFlightScreen())),
+                  ),
+                  AppSpacing.hMd,
+                  _QuickAccessItem(
+                    icon: Iconsax.building,
+                    label: 'Hotels',
+                    color: const Color(0xFF8B5CF6),
+                    onTap: () => Navigator.push(context, PageTransitions.slideRight(const HotelListScreen())),
+                  ),
+                  AppSpacing.hMd,
+                  _QuickAccessItem(
+                    icon: Iconsax.map_1,
+                    label: 'Tours',
+                    color: const Color(0xFF10B981),
+                    onTap: () => Navigator.push(context, PageTransitions.slideRight(const TourListScreen())),
+                  ),
+                  AppSpacing.hMd,
+                  _QuickAccessItem(
+                    icon: Iconsax.calendar_tick,
+                    label: 'Events',
+                    color: const Color(0xFFF97316),
+                    onTap: () => Navigator.push(context, PageTransitions.slideRight(const EventsScreen())),
+                  ),
+                ],
+              ),
+            ).fadeInUp(index: 3),
+
+            AppSpacing.vSm,
+
+            Padding(
+              padding: AppSpacing.screenH,
+              child: Row(
+                children: [
+                  _QuickAccessItem(
+                    icon: Iconsax.reserve,
+                    label: 'Food',
+                    color: const Color(0xFFEF4444),
+                    onTap: () => Navigator.push(context, PageTransitions.slideRight(const LocalDishupScreen())),
+                  ),
+                  AppSpacing.hMd,
+                  _QuickAccessItem(
+                    icon: Iconsax.dollar_circle,
+                    label: 'Currency',
+                    color: const Color(0xFFD4A853),
+                    onTap: () => Navigator.push(context, PageTransitions.slideRight(const CurrencyScreen())),
+                  ),
+                  AppSpacing.hMd,
+                  _QuickAccessItem(
+                    icon: Iconsax.global,
+                    label: 'Regions',
+                    color: const Color(0xFF14B8A6),
+                    onTap: () => Navigator.push(context, PageTransitions.slideRight(const RegionScreen())),
+                  ),
+                  AppSpacing.hMd,
+                  _QuickAccessItem(
+                    icon: Iconsax.document_text,
+                    label: 'Blog',
+                    color: const Color(0xFFEC4899),
+                    onTap: () => Navigator.push(context, PageTransitions.slideRight(const BlogListScreen())),
+                  ),
+                ],
+              ),
+            ).fadeInUp(index: 4),
+
+            AppSpacing.vXxl,
+
+            // ==================== CATEGORIES ====================
+            CategoryChips(
+              categories: MockData.homeCategories,
+              selectedIndex: _selectedCategory,
+              onSelected: (i) => setState(() => _selectedCategory = i),
+            ).fadeInUp(index: 5),
+
+            AppSpacing.vLg,
+
+            // ==================== POPULAR DESTINATIONS ====================
+            SectionHeader(
+              title: 'Popular Destinations',
+              actionText: 'See all',
+              actionIcon: Icons.arrow_forward_ios_rounded,
+              padding: AppSpacing.screenH,
+              onActionTap: () {},
+            ).fadeInUp(index: 6),
+
+            AppSpacing.vMd,
+
+            SizedBox(
+              height: 260,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: AppSpacing.screenH,
+                physics: const BouncingScrollPhysics(),
+                itemCount: MockData.destinations.length,
+                itemBuilder: (context, index) {
+                  final dest = MockData.destinations[index];
+                  return _DestinationCard(
+                    destination: dest,
+                    onTap: () => Navigator.push(
+                      context,
+                      PageTransitions.fadeScale(AttractionDetailScreen(destination: dest)),
+                    ),
+                  ).fadeInScale(index: index);
+                },
+              ),
+            ),
+
+            AppSpacing.vXxl,
+
+            // ==================== TRENDING TOURS ====================
+            SectionHeader(
+              title: 'Trending Tours',
+              actionText: 'See all',
+              actionIcon: Icons.arrow_forward_ios_rounded,
+              padding: AppSpacing.screenH,
+              onActionTap: () => Navigator.push(context, PageTransitions.slideRight(const TourListScreen())),
+            ).fadeInUp(index: 7),
+
+            AppSpacing.vMd,
+
+            SizedBox(
+              height: 180,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: AppSpacing.screenH,
+                physics: const BouncingScrollPhysics(),
+                itemCount: MockData.tours.length,
+                itemBuilder: (context, index) {
+                  final tour = MockData.tours[index];
+                  return _TourCard(tour: tour).fadeInLeft(index: index);
+                },
+              ),
+            ),
+
+            AppSpacing.vXxl,
+
+            // ==================== FEATURED BLOG POSTS ====================
+            SectionHeader(
+              title: 'Travel Stories',
+              actionText: 'See all',
+              actionIcon: Icons.arrow_forward_ios_rounded,
+              padding: AppSpacing.screenH,
+              onActionTap: () => Navigator.push(context, PageTransitions.slideRight(const BlogListScreen())),
+            ).fadeInUp(index: 8),
+
+            AppSpacing.vMd,
+
+            ...MockData.blogPosts.take(3).toList().asMap().entries.map((entry) {
+              return _BlogCard(
+                post: entry.value,
+                index: entry.key,
+              );
+            }),
+
+            // Bottom safe space for nav bar
+            const SizedBox(height: 100),
+          ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildHeader() {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(children: [
-                Text('Current Location', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textTertiary)),
-                const SizedBox(width: 4),
-                const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textTertiary),
-              ]),
-              const SizedBox(height: 4),
-              Text('Hoi An, Da Nang', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-            ],
-          ),
-        ),
-        GestureDetector(
-          onTap: () => Navigator.push(context, PageTransitions.slideRight(const NotificationScreen())),
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(14),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
-            ),
-            child: Stack(children: [
-              const Icon(Iconsax.notification, size: 22, color: AppColors.textPrimary),
-              Positioned(top: 0, right: 0, child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle))),
-            ]),
-          ),
-        ),
-        const SizedBox(width: 12),
-        GestureDetector(
-          onTap: () {},
-          child: Container(
-            width: 44, height: 44,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.primary, width: 2)),
-            child: ClipRRect(borderRadius: BorderRadius.circular(12), child: CachedNetworkImage(imageUrl: MockData.userAvatar, fit: BoxFit.cover)),
-          ),
-        ),
-      ],
-    );
-  }
+// ==================== QUICK ACCESS GRID ITEM ====================
+class _QuickAccessItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
 
-  Widget _buildSearchBar() {
-    return GestureDetector(
-      onTap: () => Navigator.push(context, PageTransitions.fade(const SearchScreen())),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 4))],
-        ),
-        child: Row(
+  const _QuickAccessItem({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Column(
           children: [
-            const Icon(Iconsax.search_normal, size: 20, color: AppColors.textTertiary),
-            const SizedBox(width: 12),
-            Expanded(child: Text('Search destinations, food, events...', style: GoogleFonts.inter(fontSize: 14, color: AppColors.textTertiary))),
             Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-              child: const Icon(Iconsax.microphone_2, size: 18, color: AppColors.primary),
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: AppSpacing.borderLg,
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            AppSpacing.vSm,
+            Text(
+              label,
+              style: AppTextStyles.labelSmall.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildCategories() {
-    return SizedBox(
-      height: 40,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: MockData.homeCategories.length,
-        itemBuilder: (context, index) {
-          final isSelected = _selectedCategory == index;
-          return GestureDetector(
-            onTap: () => setState(() => _selectedCategory = index),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.only(right: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: isSelected ? AppColors.primary : Colors.grey.shade300),
-                boxShadow: isSelected ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 3))] : null,
-              ),
-              child: Text(MockData.homeCategories[index], style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: isSelected ? Colors.white : AppColors.textSecondary)),
-            ),
-          );
-        },
-      ),
-    );
-  }
+// ==================== DESTINATION CARD ====================
+class _DestinationCard extends StatelessWidget {
+  final Map<String, dynamic> destination;
+  final VoidCallback onTap;
 
-  Widget _buildSectionHeader(String title, String action, VoidCallback onTap) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: GoogleFonts.playfairDisplay(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-        if (action.isNotEmpty) TextButton(onPressed: onTap, child: Text(action, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary))),
-      ],
-    );
-  }
+  const _DestinationCard({
+    required this.destination,
+    required this.onTap,
+  });
 
-  Widget _buildLocationCarousel() {
-    final locations = [
-      {'name': 'Da Nang', 'image': MockData.imgDaNang, 'subtitle': '🌉 Dragon Bridge City'},
-      {'name': 'Hoi An', 'image': MockData.imgHoiAn, 'subtitle': '🏮 Ancient Town'},
-      {'name': 'Hue', 'image': MockData.imgHue, 'subtitle': '🏛️ Imperial Citadel'},
-      {'name': 'Sa Pa', 'image': MockData.imgSaPa, 'subtitle': '🌾 Rice Terraces'},
-    ];
-
-    return SizedBox(
-      height: 160,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: locations.length,
-        itemBuilder: (context, index) {
-          final loc = locations[index];
-          return GestureDetector(
-            onTap: () {
-              final dest = MockData.destinations.firstWhere((d) => (d['name'] as String).contains(loc['name']!.split(',')[0]), orElse: () => MockData.destinations[0]);
-              Navigator.push(context, PageTransitions.fadeScale(AttractionDetailScreen(destination: dest)));
-            },
-            child: Container(
-              width: 260, margin: const EdgeInsets.only(right: 16),
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 12, offset: const Offset(0, 6))]),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Stack(fit: StackFit.expand, children: [
-                  CachedNetworkImage(imageUrl: loc['image']!, fit: BoxFit.cover),
-                  const DecoratedBox(decoration: BoxDecoration(gradient: AppColors.cardGradient)),
-                  Positioned(
-                    bottom: 16, left: 16,
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(loc['name']!, style: GoogleFonts.playfairDisplay(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white)),
-                      const SizedBox(height: 4),
-                      Text(loc['subtitle']!, style: GoogleFonts.inter(fontSize: 12, color: Colors.white70)),
-                    ]),
-                  ),
-                ]),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildQuickAccessGrid() {
-    final items = [
-      {'icon': Iconsax.reserve, 'label': 'Local\nDishup', 'color': AppColors.categoryFood, 'screen': 'food'},
-      {'icon': Iconsax.edit, 'label': 'New\nPosts', 'color': AppColors.categoryBeach, 'screen': 'blog'},
-      {'icon': Iconsax.calendar_1, 'label': 'Events', 'color': AppColors.categoryCulture, 'screen': 'events'},
-      {'icon': Iconsax.building_4, 'label': 'Hotels', 'color': AppColors.categoryMountain, 'screen': 'hotels'},
-      {'icon': Iconsax.airplane, 'label': 'Flights', 'color': AppColors.categoryNightlife, 'screen': 'flights'},
-      {'icon': Iconsax.message, 'label': 'Messages', 'color': AppColors.accentTeal, 'screen': 'messages'},
-      {'icon': Iconsax.map_1, 'label': 'Tours', 'color': AppColors.chipBlue, 'screen': 'tours'},
-      {'icon': Iconsax.dollar_circle, 'label': 'Currency', 'color': AppColors.chipGreen, 'screen': 'currency'},
-      {'icon': Iconsax.global, 'label': 'Regions', 'color': AppColors.chipPurple, 'screen': 'regions'},
-    ];
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, childAspectRatio: 1.1, crossAxisSpacing: 12, mainAxisSpacing: 12),
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return GestureDetector(
-          onTap: () {
-            Widget? screen;
-            switch (item['screen']) {
-              case 'food': screen = const LocalDishupScreen(); break;
-              case 'blog': screen = const BlogListScreen(); break;
-              case 'events': screen = const EventsScreen(); break;
-              case 'flights': screen = const BookFlightScreen(); break;
-              case 'messages': screen = const MessageScreen(); break;
-              case 'hotels': screen = const HotelListScreen(); break;
-              case 'tours': screen = const TourListScreen(); break;
-              case 'currency': screen = const CurrencyScreen(); break;
-              case 'regions': screen = const RegionScreen(); break;
-            }
-            if (screen != null) Navigator.push(context, PageTransitions.slideRight(screen));
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(20),
-              boxShadow: [BoxShadow(color: (item['color'] as Color).withValues(alpha: 0.15), blurRadius: 12, offset: const Offset(0, 4))],
-            ),
-            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: (item['color'] as Color).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(14)),
-                child: Icon(item['icon'] as IconData, color: item['color'] as Color, size: 24),
-              ),
-              const SizedBox(height: 8),
-              Text(item['label'] as String, textAlign: TextAlign.center, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textPrimary, height: 1.2)),
-            ]),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildDestinationsList() {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 4,
-      itemBuilder: (context, index) {
-        final dest = MockData.destinations[index];
-        return GestureDetector(
-          onTap: () => Navigator.push(context, PageTransitions.fadeScale(AttractionDetailScreen(destination: dest))),
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 16), height: 200,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 16, offset: const Offset(0, 6))]),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: Stack(fit: StackFit.expand, children: [
-                CachedNetworkImage(imageUrl: dest['image'], fit: BoxFit.cover),
-                const DecoratedBox(decoration: BoxDecoration(gradient: AppColors.cardGradient)),
-                Positioned(
-                  top: 16, left: 16,
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(dest['name'], style: GoogleFonts.playfairDisplay(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white)),
-                    Text(dest['location'], style: GoogleFonts.inter(fontSize: 13, color: Colors.white70)),
-                  ]),
-                ),
-                Positioned(
-                  top: 16, right: 16,
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)), child: const Icon(Iconsax.archive_add, color: Colors.white, size: 20)),
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 200,
+        margin: const EdgeInsets.only(right: 16),
+        decoration: BoxDecoration(
+          borderRadius: AppSpacing.borderXl,
+          boxShadow: AppColors.cardShadow,
+        ),
+        child: ClipRRect(
+          borderRadius: AppSpacing.borderXl,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              CachedNetworkImage(
+                imageUrl: destination['image'],
+                fit: BoxFit.cover,
+                placeholder: (_, __) => Container(
+                  color: AppColors.primarySurface,
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
+              ),
+              const DecoratedBox(
+                decoration: BoxDecoration(gradient: AppColors.cardGradient),
+              ),
+              // Rating badge
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    borderRadius: AppSpacing.borderSm,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star_rounded, color: AppColors.accentGold, size: 14),
+                      const SizedBox(width: 2),
+                      Text(
+                        '${destination['rating']}',
+                        style: AppTextStyles.labelSmall.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Price badge
+              if (destination['price'] != null && destination['price'] > 0)
                 Positioned(
-                  bottom: 16, right: 16,
+                  top: 12,
+                  left: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(20)),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      const Icon(Icons.star_rounded, color: AppColors.accentGold, size: 16),
-                      const SizedBox(width: 4),
-                      Text('${dest['rating']}', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
-                    ]),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.85),
+                      borderRadius: AppSpacing.borderSm,
+                    ),
+                    child: Text(
+                      '\$${destination['price']}',
+                      style: AppTextStyles.badge,
+                    ),
                   ),
                 ),
-                Positioned(
-                  bottom: 16, left: 16,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.85), borderRadius: BorderRadius.circular(8)),
-                    child: Text(dest['price'] == 0 ? 'Free' : 'From \$${dest['price']}', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
-                  ),
-                ),
-              ]),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildEventsPreview() {
-    return SizedBox(
-      height: 220,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: 4,
-        itemBuilder: (context, index) {
-          final event = MockData.events[index];
-          return GestureDetector(
-            onTap: () => Navigator.push(context, PageTransitions.slideRight(const EventsScreen())),
-            child: Container(
-              width: 280, margin: const EdgeInsets.only(right: 16),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 4))]),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Stack(children: [
-                  ClipRRect(borderRadius: const BorderRadius.vertical(top: Radius.circular(20)), child: CachedNetworkImage(imageUrl: event['image'], height: 120, width: double.infinity, fit: BoxFit.cover)),
-                  Positioned(top: 10, left: 10, child: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(6)), child: Text(event['category'] ?? '', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white)))),
-                ]),
-                Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(event['date'], style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primary)),
+              // Bottom info
+              Positioned(
+                bottom: 16,
+                left: 14,
+                right: 14,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      destination['name'],
+                      style: AppTextStyles.titleMedium.white,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     const SizedBox(height: 4),
-                    Text(event['title'], maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-                    const SizedBox(height: 6),
-                    Row(children: [
-                      const Icon(Iconsax.location, size: 14, color: AppColors.textTertiary),
-                      const SizedBox(width: 4),
-                      Expanded(child: Text(event['location'], maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.inter(fontSize: 12, color: AppColors.textTertiary))),
-                    ]),
-                  ]),
+                    Row(
+                      children: [
+                        const Icon(Iconsax.location, size: 12, color: Colors.white70),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            destination['location'],
+                            style: AppTextStyles.labelSmall.white70,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ]),
-            ),
-          );
-        },
+              ),
+            ],
+          ),
+        ),
       ),
     );
+  }
+}
+
+// ==================== TOUR CARD ====================
+class _TourCard extends StatelessWidget {
+  final Map<String, dynamic> tour;
+
+  const _TourCard({required this.tour});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 300,
+      margin: const EdgeInsets.only(right: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: AppSpacing.borderXl,
+        boxShadow: AppSpacing.shadowMd,
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.horizontal(left: Radius.circular(20)),
+            child: CachedNetworkImage(
+              imageUrl: tour['image'],
+              width: 120,
+              height: double.infinity,
+              fit: BoxFit.cover,
+              placeholder: (_, __) => Container(
+                width: 120,
+                color: AppColors.primarySurface,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.primarySurface,
+                      borderRadius: AppSpacing.borderSm,
+                    ),
+                    child: Text(
+                      tour['duration'],
+                      style: AppTextStyles.badge.primary,
+                    ),
+                  ),
+                  AppSpacing.vSm,
+                  Text(
+                    tour['name'],
+                    style: AppTextStyles.titleSmall,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const Spacer(),
+                  Row(
+                    children: [
+                      const Icon(Icons.star_rounded, size: 14, color: AppColors.accentGold),
+                      const SizedBox(width: 2),
+                      Text('${tour['rating']}', style: AppTextStyles.rating.copyWith(fontSize: 12)),
+                      Text(
+                        ' (${tour['reviews']})',
+                        style: AppTextStyles.labelSmall,
+                      ),
+                      const Spacer(),
+                      Text(
+                        '\$${tour['price']}',
+                        style: AppTextStyles.titleMedium.primary,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==================== BLOG CARD ====================
+class _BlogCard extends StatelessWidget {
+  final Map<String, dynamic> post;
+  final int index;
+
+  const _BlogCard({required this.post, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      child: GlassContainer.solid(
+        borderRadius: 20,
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: AppSpacing.borderMd,
+              child: CachedNetworkImage(
+                imageUrl: post['image'],
+                width: 90,
+                height: 90,
+                fit: BoxFit.cover,
+                placeholder: (_, __) => Container(
+                  width: 90,
+                  height: 90,
+                  color: AppColors.primarySurface,
+                ),
+              ),
+            ),
+            AppSpacing.hMd,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    post['title'],
+                    style: AppTextStyles.titleSmall,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  AppSpacing.vSm,
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 10,
+                        backgroundImage: CachedNetworkImageProvider(post['authorAvatar']),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          post['author'],
+                          style: AppTextStyles.labelSmall.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                      Text(post['date'], style: AppTextStyles.labelSmall),
+                    ],
+                  ),
+                  AppSpacing.vSm,
+                  Row(
+                    children: [
+                      const Icon(Iconsax.heart, size: 14, color: AppColors.chipRed),
+                      const SizedBox(width: 4),
+                      Text('${post['likes']}', style: AppTextStyles.labelSmall),
+                      AppSpacing.hMd,
+                      const Icon(Iconsax.message, size: 14, color: AppColors.textTertiary),
+                      const SizedBox(width: 4),
+                      Text('${post['comments']}', style: AppTextStyles.labelSmall),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ).fadeInUp(index: index + 9);
   }
 }

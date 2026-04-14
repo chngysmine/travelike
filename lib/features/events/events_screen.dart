@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/app_spacing.dart';
+import '../../core/widgets/app_search_bar.dart';
+import '../../core/widgets/category_chips.dart';
+import '../../core/widgets/premium_card.dart';
+import '../../core/widgets/glass_container.dart';
+import '../../core/widgets/app_back_button.dart';
+import '../../core/utils/app_animations.dart';
 import '../../core/utils/page_transitions.dart';
 import '../../data/mock_data.dart';
-import '../payment/payment_screen.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -16,8 +22,8 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
-  bool _showUpcoming = true;
   int _selectedCategory = 0;
+  bool _isUpcoming = true;
 
   List<Map<String, dynamic>> get _filteredEvents {
     if (_selectedCategory == 0) return MockData.events;
@@ -27,223 +33,111 @@ class _EventsScreenState extends State<EventsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(children: [
-                  GestureDetector(onTap: () => Navigator.pop(context), child: const Icon(Icons.arrow_back_ios_new, size: 20)),
-                  const SizedBox(width: 12),
-                  Text('Events', style: GoogleFonts.playfairDisplay(fontSize: 24, fontWeight: FontWeight.w700)),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8)]),
-                    child: const Icon(Iconsax.search_normal, size: 20, color: AppColors.textSecondary),
-                  ),
-                ]),
-              ).animate().fadeIn(duration: 400.ms),
-
-              // Toggle
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
+      backgroundColor: AppColors.backgroundLight,
+      appBar: AppBar(
+        leading: const Padding(
+           padding: EdgeInsets.only(left: 10),
+           child: AppBackButton(),
+        ),
+        title: Text('Events & Shows', style: AppTextStyles.displayMedium),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          // ==================== TOGGLE & SEARCH ====================
+          Padding(
+            padding: AppSpacing.screenH,
+            child: Column(
+              children: [
+                AppSpacing.vMd,
+                // Custom Toggle
+                GlassContainer.solid(
+                  height: 48,
+                  borderRadius: 24,
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
-                  child: Row(children: [
-                    Expanded(child: GestureDetector(
-                      onTap: () => setState(() => _showUpcoming = true),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(color: _showUpcoming ? AppColors.primary : Colors.transparent, borderRadius: BorderRadius.circular(10)),
-                        child: Center(child: Text('Upcoming', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: _showUpcoming ? Colors.white : AppColors.textSecondary))),
-                      ),
-                    )),
-                    Expanded(child: GestureDetector(
-                      onTap: () => setState(() => _showUpcoming = false),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(color: !_showUpcoming ? AppColors.primary : Colors.transparent, borderRadius: BorderRadius.circular(10)),
-                        child: Center(child: Text('Past events', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: !_showUpcoming ? Colors.white : AppColors.textSecondary))),
-                      ),
-                    )),
-                  ]),
-                ),
-              ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
-
-              const SizedBox(height: 12),
-
-              // Category chips
-              SizedBox(
-                height: 36,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: MockData.eventCategories.length,
-                  itemBuilder: (_, index) {
-                    final isSelected = _selectedCategory == index;
-                    return GestureDetector(
-                      onTap: () => setState(() => _selectedCategory = index),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        margin: const EdgeInsets.only(right: 8),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : Colors.transparent,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: isSelected ? AppColors.primary : Colors.grey.shade300),
-                        ),
-                        child: Center(child: Text(MockData.eventCategories[index], style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w500, color: isSelected ? AppColors.primary : AppColors.textTertiary))),
-                      ),
-                    );
-                  },
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: _filteredEvents.length,
-                  itemBuilder: (context, index) {
-                    final event = _filteredEvents[index];
-                    return GestureDetector(
-                      onTap: () => Navigator.push(context, PageTransitions.fadeScale(_EventDetailScreen(event: event))),
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 4))]),
-                        child: Row(children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.horizontal(left: Radius.circular(20)),
-                            child: CachedNetworkImage(imageUrl: event['image'], width: 100, height: 110, fit: BoxFit.cover),
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(14),
-                              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                Row(children: [
-                                  Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(6)), child: Text(event['category'] ?? '', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.primary))),
-                                  const Spacer(),
-                                  if (event['price'] == 0) Text('FREE', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.chipGreen))
-                                  else Text('\$${event['price']}', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.primary)),
-                                ]),
-                                const SizedBox(height: 6),
-                                Text(event['title'], maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
-                                const SizedBox(height: 6),
-                                Row(children: [
-                                  const Icon(Iconsax.calendar_1, size: 12, color: AppColors.textTertiary),
-                                  const SizedBox(width: 4),
-                                  Expanded(child: Text(event['date'], style: GoogleFonts.inter(fontSize: 11, color: AppColors.textTertiary))),
-                                ]),
-                                const SizedBox(height: 4),
-                                Row(children: [
-                                  const Icon(Iconsax.location, size: 12, color: AppColors.textTertiary),
-                                  const SizedBox(width: 4),
-                                  Expanded(child: Text(event['location'], maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.inter(fontSize: 11, color: AppColors.textTertiary))),
-                                ]),
-                              ]),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => _isUpcoming = true),
+                          child: AnimatedContainer(
+                            duration: AppAnimations.fast,
+                            decoration: BoxDecoration(
+                              color: _isUpcoming ? AppColors.primary : Colors.transparent,
+                              borderRadius: AppSpacing.borderRound,
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Upcoming',
+                              style: AppTextStyles.labelMedium.copyWith(
+                                color: _isUpcoming ? Colors.white : AppColors.textSecondary,
+                              ),
                             ),
                           ),
-                        ]),
+                        ),
                       ),
-                    ).animate().fadeIn(duration: 400.ms, delay: (index * 80).ms).slideX(begin: 0.03, end: 0);
-                  },
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => _isUpcoming = false),
+                          child: AnimatedContainer(
+                            duration: AppAnimations.fast,
+                            decoration: BoxDecoration(
+                              color: !_isUpcoming ? AppColors.primary : Colors.transparent,
+                              borderRadius: AppSpacing.borderRound,
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Past Events',
+                              style: AppTextStyles.labelMedium.copyWith(
+                                color: !_isUpcoming ? Colors.white : AppColors.textSecondary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                AppSpacing.vLg,
+                const AppSearchBar(
+                  hintText: 'Search concerts, festivals...',
+                  showFilter: true,
+                ),
+              ],
+            ).fadeInUp(),
           ),
-        ),
-      ),
-    );
-  }
-}
 
-class _EventDetailScreen extends StatelessWidget {
-  final Map<String, dynamic> event;
-  const _EventDetailScreen({required this.event});
+          AppSpacing.vLg,
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Column(children: [
-              SizedBox(height: 320, width: double.infinity, child: Stack(fit: StackFit.expand, children: [
-                CachedNetworkImage(imageUrl: event['image'], fit: BoxFit.cover),
-                const DecoratedBox(decoration: BoxDecoration(gradient: AppColors.cardGradient)),
-              ])),
-              Container(
-                transform: Matrix4.translationValues(0, -28, 0),
-                decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
-                padding: const EdgeInsets.all(24),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(event['title'], style: GoogleFonts.playfairDisplay(fontSize: 26, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 16),
-                  _DetailRow(icon: Iconsax.calendar_1, title: event['date'], subtitle: event['time']),
-                  const SizedBox(height: 12),
-                  _DetailRow(icon: Iconsax.location, title: event['location'], subtitle: event['address']),
-                  const SizedBox(height: 20),
-                  Row(children: [
-                    CircleAvatar(radius: 22, backgroundImage: CachedNetworkImageProvider(event['organizerAvatar'])),
-                    const SizedBox(width: 12),
-                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(event['organizer'], style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600)),
-                      Text('Organizer', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textTertiary)),
-                    ])),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(8)),
-                      child: Text('Follow', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary)),
+          // ==================== CATEGORIES ====================
+          CategoryChips(
+            categories: MockData.eventCategories,
+            selectedIndex: _selectedCategory,
+            onSelected: (i) => setState(() => _selectedCategory = i),
+            filled: false,
+          ).fadeInUp(delay: 50.ms),
+
+          AppSpacing.vLg,
+
+          // ==================== EVENTS LIST ====================
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+              physics: const BouncingScrollPhysics(),
+              itemCount: _filteredEvents.length,
+              itemBuilder: (context, index) {
+                final event = _filteredEvents[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: PremiumCard.event(
+                    data: event,
+                    onTap: () => Navigator.push(
+                      context,
+                      PageTransitions.slideUp(_EventDetailScreen(event: event)),
                     ),
-                  ]),
-                  const SizedBox(height: 20),
-                  Text('About Event', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 8),
-                  Text(event['description'], style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary, height: 1.7)),
-                  const SizedBox(height: 16),
-                  Row(children: [
-                    const Icon(Iconsax.people, size: 18, color: AppColors.primary),
-                    const SizedBox(width: 8),
-                    Text('${event['going']}+ Going', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.primary)),
-                  ]),
-                  const SizedBox(height: 100),
-                ]),
-              ),
-            ]),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 8, left: 16, right: 16,
-            child: Row(children: [
-              GestureDetector(onTap: () => Navigator.pop(context), child: Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.arrow_back_ios_new, size: 18))),
-              const Spacer(),
-              Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(14)), child: const Icon(Iconsax.archive_add, size: 20)),
-            ]),
-          ),
-          Positioned(
-            bottom: 0, left: 0, right: 0,
-            child: Container(
-              padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(context).padding.bottom + 16),
-              decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 16, offset: const Offset(0, -4))]),
-              child: Row(children: [
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Price', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textTertiary)),
-                  Text(event['price'] == 0 ? 'Free' : '\$${event['price']}', style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.primary)),
-                ]),
-                const Spacer(),
-                SizedBox(height: 52, child: ElevatedButton(
-                  onPressed: () => Navigator.push(context, PageTransitions.slideUp(const PaymentScreen())),
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), padding: const EdgeInsets.symmetric(horizontal: 32)),
-                  child: Text('Buy Ticket', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
-                )),
-              ]),
+                  ).fadeInScale(index: index),
+                );
+              },
             ),
           ),
         ],
@@ -252,25 +146,216 @@ class _EventDetailScreen extends StatelessWidget {
   }
 }
 
-class _DetailRow extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  const _DetailRow({required this.icon, required this.title, required this.subtitle});
+// ==================== EVENT DETAIL SCREEN ====================
+class _EventDetailScreen extends StatelessWidget {
+  final Map<String, dynamic> event;
+
+  const _EventDetailScreen({required this.event});
 
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(12)),
-        child: Icon(icon, size: 22, color: AppColors.primary),
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          // Hero Header
+          SliverAppBar(
+            expandedHeight: 400,
+            pinned: true,
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 10, top: 4),
+              child: AppBackButton.onImage(),
+            ),
+            actions: [
+               Padding(
+                 padding: const EdgeInsets.only(right: 16, top: 4),
+                 child: AppActionButton(icon: Icons.favorite_border_rounded, isOnImage: true, onTap: () {}),
+               ),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: event['image'],
+                    fit: BoxFit.cover,
+                  ),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(gradient: AppColors.cardGradient),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          // Content
+          SliverToBoxAdapter(
+            child: Transform.translate(
+              offset: const Offset(0, -30),
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: AppColors.backgroundLight,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                ),
+                child: Padding(
+                  padding: AppSpacing.screenH,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppSpacing.vXxl,
+                      // Badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: AppSpacing.borderSm),
+                        child: Text(event['category'], style: AppTextStyles.labelMedium.primary),
+                      ).fadeInUp(),
+                      AppSpacing.vLg,
+                      // Title
+                      Text(event['title'] ?? event['name'] ?? 'Event', style: AppTextStyles.displayLarge).fadeInUp(delay: 50.ms),
+                      AppSpacing.vXxl,
+                      
+                      // Info Grid
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _InfoTile(icon: Iconsax.calendar_1, title: 'Date', subtitle: event['date']),
+                          ),
+                          Expanded(
+                            child: _InfoTile(icon: Iconsax.clock, title: 'Time', subtitle: '19:00 - 22:30'),
+                          ),
+                        ],
+                      ).fadeInUp(delay: 100.ms),
+                      AppSpacing.vLg,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _InfoTile(icon: Iconsax.location, title: 'Location', subtitle: event['location']),
+                          ),
+                          Expanded(
+                            child: _InfoTile(icon: Iconsax.ticket_2, title: 'Price', subtitle: '\$${event['price']}'),
+                          ),
+                        ],
+                      ).fadeInUp(delay: 150.ms),
+                      
+                      AppSpacing.vXxl,
+                      
+                      // Attendees
+                      Text('Going with', style: AppTextStyles.titleMedium).fadeInUp(delay: 200.ms),
+                      AppSpacing.vLg,
+                      SizedBox(
+                        height: 48,
+                        child: Stack(
+                          children: [
+                            ...List.generate(5, (index) {
+                              return Positioned(
+                                left: index * 36.0,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: AppColors.backgroundLight, width: 3),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 20,
+                                    backgroundImage: CachedNetworkImageProvider(MockData.teamMembers[index]['avatar'] ?? ''),
+                                  ),
+                                ),
+                              );
+                            }),
+                            Positioned(
+                              left: 5 * 36.0,
+                              child: Container(
+                                width: 44, height: 44,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primarySurface,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.backgroundLight, width: 3),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text('+24', style: AppTextStyles.labelMedium.primary),
+                              ),
+                            )
+                          ],
+                        ),
+                      ).fadeInUp(delay: 250.ms),
+
+                      AppSpacing.vXxl,
+                      Text('About Event', style: AppTextStyles.titleMedium).fadeInUp(delay: 300.ms),
+                      AppSpacing.vMd,
+                      Text(
+                        'Experience the magic of ${event['name']} live. This spectacular event brings together the best performers for an unforgettable night of entertainment and culture. Join thousands of fans in this historic celebration. Limited tickets available, book yours now to secure a spot!',
+                        style: AppTextStyles.bodyLarge,
+                      ).fadeInUp(delay: 350.ms),
+                      
+                      const SizedBox(height: 120), // Bottom padding
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-      const SizedBox(width: 14),
-      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
-        Text(subtitle, style: GoogleFonts.inter(fontSize: 12, color: AppColors.textTertiary)),
-      ])),
-    ]);
+      // Booking Bottom Bar
+      bottomSheet: Container(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, -4))],
+        ),
+        child: Row(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Total Price', style: AppTextStyles.labelSmall),
+                Text('\$${event['price']}', style: AppTextStyles.price),
+              ],
+            ),
+            AppSpacing.hLg,
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {},
+                child: const Text('Book Ticket Now'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  const _InfoTile({required this.icon, required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: AppSpacing.borderMd),
+          child: Icon(icon, color: AppColors.primary, size: 20),
+        ),
+        AppSpacing.hMd,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: AppTextStyles.labelSmall),
+              const SizedBox(height: 2),
+              Text(subtitle, style: AppTextStyles.labelMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

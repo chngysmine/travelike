@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/app_spacing.dart';
+import '../../core/widgets/glass_container.dart';
+import '../../core/utils/app_animations.dart';
 import '../../core/utils/page_transitions.dart';
 import '../../data/mock_data.dart';
 import '../settings/settings_screen.dart';
 import 'edit_profile_screen.dart';
-import '../social/message_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -34,128 +36,232 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  const SizedBox(width: 32),
-                  const Spacer(),
-                  Text('Profile', style: GoogleFonts.playfairDisplay(fontSize: 24, fontWeight: FontWeight.w700)),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () => Navigator.push(context, PageTransitions.slideRight(const SettingsScreen())),
-                    child: const Icon(Iconsax.setting_2, size: 22),
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              expandedHeight: 400,
+              pinned: true,
+              backgroundColor: AppColors.backgroundLight,
+              actions: [
+                GestureDetector(
+                  onTap: () => Navigator.push(context, PageTransitions.slideRight(const SettingsScreen())),
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 20),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: AppSpacing.shadowSm),
+                    child: const Icon(Iconsax.setting_2, size: 20, color: AppColors.textPrimary),
                   ),
-                ],
-              ),
-            ).animate().fadeIn(duration: 400.ms),
-            const SizedBox(height: 24),
-            // Avatar
-            GestureDetector(
-              onTap: () => Navigator.push(context, PageTransitions.slideRight(const EditProfileScreen())),
-              child: Stack(
-                children: [
-                  Container(
-                    width: 120, height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.3), width: 4),
-                      boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 8))],
-                    ),
-                    child: ClipOval(child: CachedNetworkImage(imageUrl: MockData.userAvatar, fit: BoxFit.cover)),
-                  ),
-                  Positioned(
-                    bottom: 4, right: 4,
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(color: AppColors.primary, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 3)),
-                      child: const Icon(Iconsax.edit, size: 14, color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ).animate().fadeIn(duration: 500.ms, delay: 100.ms).scale(begin: const Offset(0.8, 0.8)),
-            const SizedBox(height: 16),
-            Text(MockData.userFullName, style: GoogleFonts.playfairDisplay(fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.textPrimary)).animate().fadeIn(duration: 400.ms, delay: 200.ms),
-            const SizedBox(height: 4),
-            Text(MockData.userBio.split('\n')[0], style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)).animate().fadeIn(duration: 400.ms, delay: 250.ms),
-            const SizedBox(height: 16),
-            // Stats
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _StatItem(count: '350', label: 'Following'),
-                Container(height: 30, width: 1, margin: const EdgeInsets.symmetric(horizontal: 24), color: Colors.grey.shade300),
-                _StatItem(count: '346', label: 'Followers'),
-                Container(height: 30, width: 1, margin: const EdgeInsets.symmetric(horizontal: 24), color: Colors.grey.shade300),
-                _StatItem(count: '12', label: 'Posts'),
+                ),
               ],
-            ).animate().fadeIn(duration: 400.ms, delay: 300.ms),
-            const SizedBox(height: 24),
-            // Actions
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () => Navigator.push(context, PageTransitions.slideRight(const EditProfileScreen())),
-                      icon: const Icon(Iconsax.edit, size: 18),
-                      label: Text('Edit', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white, backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              flexibleSpace: FlexibleSpaceBar(
+                background: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    // Cover Photo
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: 200,
+                      child: CachedNetworkImage(
+                        imageUrl: 'https://images.unsplash.com/photo-1546272989-40c92939c6c2?q=80&w=1200&auto=format&fit=crop', // Halong Bay Cover
+                        fit: BoxFit.cover,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => Navigator.push(context, PageTransitions.slideRight(const MessageScreen())),
-                      icon: const Icon(Iconsax.message, size: 18),
-                      label: Text('Messages', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    // Gradient overlay for reading status bar
+                    Positioned(
+                      top: 0, left: 0, right: 0, height: 100,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                            colors: [Colors.black.withValues(alpha: 0.5), Colors.transparent],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    // Profile Content
+                    Positioned(
+                      top: 150,
+                      left: 0,
+                      right: 0,
+                      child: Column(
+                        children: [
+                          // Avatar & Edit button
+                          Stack(
+                            alignment: Alignment.bottomRight,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(color: AppColors.backgroundLight, shape: BoxShape.circle),
+                                child: CircleAvatar(
+                                  radius: 46,
+                                  backgroundImage: CachedNetworkImageProvider(MockData.userAvatar),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () => Navigator.push(context, PageTransitions.slideUp(const EditProfileScreen())),
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: AppColors.backgroundLight, width: 3),
+                                  ),
+                                  child: const Icon(Iconsax.edit_2, color: Colors.white, size: 14),
+                                ),
+                              ),
+                            ],
+                          ).fadeInScale(),
+                          AppSpacing.vLg,
+                          // Name & Bio
+                          Text(MockData.userFullName, style: AppTextStyles.displayMedium).fadeInUp(delay: 100.ms),
+                          AppSpacing.vXs,
+                          Text('Traveler, Foodie, Photographer ✨', style: AppTextStyles.bodyMedium).fadeInUp(delay: 150.ms),
+                          AppSpacing.vLg,
+                          // Stats Bar
+                          Padding(
+                            padding: AppSpacing.screenH,
+                            child: GlassContainer.solid(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              borderRadius: 24,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  _StatBlock(title: 'Following', value: '254'),
+                                  Container(width: 1, height: 30, color: Colors.grey.withValues(alpha: 0.2)),
+                                  _StatBlock(title: 'Followers', value: '1.2K'),
+                                  Container(width: 1, height: 30, color: Colors.grey.withValues(alpha: 0.2)),
+                                  _StatBlock(title: 'Trips', value: '45'),
+                                ],
+                              ),
+                            ).fadeInUp(delay: 200.ms),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ).animate().fadeIn(duration: 400.ms, delay: 400.ms),
-            const SizedBox(height: 28),
+            ),
             // Tab Bar
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey.shade200))),
-              child: TabBar(
-                controller: _tabController,
-                labelColor: AppColors.primary,
-                unselectedLabelColor: AppColors.textTertiary,
-                indicatorColor: AppColors.primary,
-                indicatorWeight: 2.5,
-                labelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
-                unselectedLabelStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w400),
-                tabs: const [Tab(text: 'ABOUT'), Tab(text: 'EVENT'), Tab(text: 'REVIEWS')],
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _SliverAppBarDelegate(
+                TabBar(
+                  controller: _tabController,
+                  indicator: UnderlineTabIndicator(
+                    borderSide: const BorderSide(color: AppColors.primary, width: 3),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  indicatorPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  tabs: const [
+                    Tab(text: 'Photos'),
+                    Tab(text: 'Reviews'),
+                    Tab(text: 'Interests'),
+                  ],
+                ),
               ),
             ),
-            SizedBox(
-              height: 400,
-              child: TabBarView(
-                controller: _tabController,
-                children: [_AboutTab(), _EventTab(), _ReviewsTab()],
+          ];
+        },
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            // Photos Tab
+            GridView.builder(
+              padding: const EdgeInsets.fromLTRB(4, 4, 4, 100),
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 4,
+                mainAxisSpacing: 4,
               ),
+              itemCount: 15,
+              itemBuilder: (context, index) {
+                final imgs = [
+                  MockData.imgHaLongBay,
+                  MockData.imgDaNang,
+                  MockData.imgHue,
+                ];
+                return CachedNetworkImage(
+                  imageUrl: imgs[index % 3],
+                  fit: BoxFit.cover,
+                ).fadeInSimple(delay: Duration(milliseconds: index * 30));
+              },
             ),
-            const SizedBox(height: 80),
+            // Reviews Tab
+            ListView.builder(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+              itemCount: 5,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: AppSpacing.card,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: AppSpacing.borderLg,
+                    boxShadow: AppSpacing.shadowSm,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: AppSpacing.borderSm,
+                            child: CachedNetworkImage(
+                              imageUrl: MockData.tours[index % MockData.tours.length]['image'],
+                              width: 40, height: 40, fit: BoxFit.cover,
+                            ),
+                          ),
+                          AppSpacing.hMd,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(MockData.tours[index % MockData.tours.length]['name'], style: AppTextStyles.labelMedium),
+                                Row(children: List.generate(5, (_) => const Icon(Icons.star, size: 12, color: AppColors.accentGold))),
+                              ],
+                            ),
+                          ),
+                          Text('2w ago', style: AppTextStyles.labelSmall),
+                        ],
+                      ),
+                      AppSpacing.vMd,
+                      Text(
+                        'Amazing experience! The tour guide was very knowledgeable and the views were breathtaking.',
+                        style: AppTextStyles.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ).fadeInUp(index: index);
+              },
+            ),
+            // Interests Tab
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: MockData.settingsItems.map((e) => GlassContainer.solid(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  borderRadius: 20,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(e['icon'] as String, style: const TextStyle(fontSize: 16)),
+                      AppSpacing.hSm,
+                      Text(e['title'] as String, style: AppTextStyles.labelMedium),
+                    ],
+                  ),
+                )).toList(),
+              ),
+            ).fadeInUp(),
           ],
         ),
       ),
@@ -163,118 +269,40 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   }
 }
 
-class _StatItem extends StatelessWidget {
-  final String count;
-  final String label;
-  const _StatItem({required this.count, required this.label});
+class _StatBlock extends StatelessWidget {
+  final String title;
+  final String value;
+  const _StatBlock({required this.title, required this.value});
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Text(count, style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-      Text(label, style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
-    ]);
-  }
-}
-
-class _AboutTab extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(MockData.userBio, style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary, height: 1.6)),
-        const SizedBox(height: 16),
-        Text('Interest', style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.primary)),
-        const SizedBox(height: 12),
-        Wrap(spacing: 8, runSpacing: 8, children: [
-          _InterestChip('Games Online', AppColors.chipGreen),
-          _InterestChip('Concert', AppColors.chipRed),
-          _InterestChip('Music', AppColors.chipOrange),
-          _InterestChip('Art', AppColors.chipPurple),
-          _InterestChip('Movie', AppColors.chipBlue),
-          _InterestChip('Travel', AppColors.chipTeal),
-          _InterestChip('Food', AppColors.categoryFood),
-        ]),
-      ]),
+    return Column(
+      children: [
+        Text(value, style: AppTextStyles.titleLarge.primary),
+        AppSpacing.vXs,
+        Text(title, style: AppTextStyles.labelSmall),
+      ],
     );
   }
 }
 
-class _InterestChip extends StatelessWidget {
-  final String label;
-  final Color color;
-  const _InterestChip(this.label, this.color);
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar tabBar;
+  _SliverAppBarDelegate(this.tabBar);
 
   @override
-  Widget build(BuildContext context) {
+  double get minExtent => tabBar.preferredSize.height;
+  @override
+  double get maxExtent => tabBar.preferredSize.height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(20)),
-      child: Text(label, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
+      color: AppColors.backgroundLight,
+      child: tabBar,
     );
   }
-}
 
-class _EventTab extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(20),
-      itemCount: MockData.events.length > 5 ? 5 : MockData.events.length,
-      itemBuilder: (context, index) {
-        final event = MockData.events[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(16)),
-          child: Row(children: [
-            ClipRRect(borderRadius: BorderRadius.circular(12), child: CachedNetworkImage(imageUrl: event['image'], width: 70, height: 70, fit: BoxFit.cover)),
-            const SizedBox(width: 12),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(event['date'], style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primary)),
-              const SizedBox(height: 4),
-              Text(event['title'], maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
-            ])),
-          ]),
-        );
-      },
-    );
-  }
-}
-
-class _ReviewsTab extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final reviews = [
-      {'name': 'Rocks Velkeinjen', 'date': '10 Feb', 'rating': 4, 'text': 'Amazing travel companion app! Every feature I need in one place.', 'avatar': MockData.avatar3},
-      {'name': 'Angelina Zolly', 'date': '8 Feb', 'rating': 5, 'text': 'The best way to explore Vietnam! Love the food recommendations.', 'avatar': MockData.avatar4},
-      {'name': 'Zenifero Bolex', 'date': '5 Feb', 'rating': 5, 'text': 'Incredible experience! Would definitely recommend to friends.', 'avatar': MockData.avatar5},
-    ];
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(20),
-      itemCount: reviews.length,
-      itemBuilder: (context, index) {
-        final review = reviews[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: AppColors.primarySurface, borderRadius: BorderRadius.circular(16)),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              CircleAvatar(radius: 18, backgroundImage: CachedNetworkImageProvider(review['avatar'] as String)),
-              const SizedBox(width: 10),
-              Expanded(child: Text(review['name'] as String, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600))),
-              Text(review['date'] as String, style: GoogleFonts.inter(fontSize: 12, color: AppColors.textTertiary)),
-            ]),
-            const SizedBox(height: 8),
-            Row(children: List.generate(5, (i) => Icon(Icons.star, size: 16, color: i < (review['rating'] as int) ? AppColors.accentGold : Colors.grey.shade300))),
-            const SizedBox(height: 8),
-            Text(review['text'] as String, style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary, height: 1.5)),
-          ]),
-        );
-      },
-    );
-  }
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) => false;
 }
