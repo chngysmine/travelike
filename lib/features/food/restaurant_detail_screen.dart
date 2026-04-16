@@ -56,7 +56,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> with Si
                   fit: StackFit.expand,
                   children: [
                     CachedNetworkImage(
-                      imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop',
+                      imageUrl: 'https://images.unsplash.com/photo-1540611025311-01df3cef54b5?w=800',
                       fit: BoxFit.cover,
                     ),
                     const DecoratedBox(
@@ -138,7 +138,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> with Si
                   name: 'Pho Bo (Beef Noodle Soup) - Special',
                   desc: 'Traditional Vietnamese soup consisting of broth, rice noodles, herbs, and beef.',
                   price: 8.50,
-                  image: 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?q=80&w=200&fit=crop',
+                  image: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=800',
                   delay: index * 50,
                 );
               },
@@ -328,7 +328,7 @@ class _ReviewItem extends StatelessWidget {
             children: [
               const CircleAvatar(
                 radius: 20,
-                backgroundImage: CachedNetworkImageProvider('https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200'),
+                backgroundImage: CachedNetworkImageProvider('https://images.unsplash.com/photo-1533050487297-09b450131914?w=800'),
               ),
               AppSpacing.hMd,
               Expanded(

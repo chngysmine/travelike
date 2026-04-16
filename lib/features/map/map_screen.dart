@@ -18,7 +18,7 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   // A mock map background using an aerial/map view from Unsplash
-  final String mapImageUrl = 'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1200&auto=format&fit=crop';
+  final String mapImageUrl = 'https://images.unsplash.com/photo-1540611025311-01df3cef54b5?w=800';
   
   // Simulated map markers
   final List<Offset> _markers = [
@@ -104,7 +104,7 @@ class _MapScreenState extends State<MapScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: CachedNetworkImage(
-                      imageUrl: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=200&auto=format&fit=crop',
+                      imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=800',
                       width: 80,
                       height: 80,
                       fit: BoxFit.cover,

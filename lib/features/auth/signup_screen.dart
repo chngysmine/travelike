@@ -31,7 +31,7 @@ class _SignupScreenState extends State<SignupScreen> {
         children: [
           // ==================== BACKGROUND ====================
           CachedNetworkImage(
-            imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=800&auto=format&fit=crop', // Halong Bay
+            imageUrl: 'https://images.unsplash.com/photo-1540611025311-01df3cef54b5?w=800', // Halong Bay
             fit: BoxFit.cover,
           ),
           DecoratedBox(

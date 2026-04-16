@@ -11,6 +11,7 @@ import '../../core/widgets/glass_container.dart';
 import '../../core/utils/app_animations.dart';
 import '../../core/utils/page_transitions.dart';
 import '../../data/mock_data.dart';
+import '../super_app_hub_screen.dart';
 import '../events/events_screen.dart';
 import '../food/local_dishup_screen.dart';
 import '../flights/book_flight_screen.dart';
@@ -37,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      bottom: false,
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -129,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ).fadeInUp(),
 
-            AppSpacing.vLg,
+            // (Banner removed from here and moved to Quick Access section)
 
             // ==================== SEARCH BAR ====================
             Padding(
@@ -151,6 +153,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ).fadeInUp(index: 2),
 
             AppSpacing.vMd,
+
+            // ==================== EXPLORE ALL BANNER ====================
+            const _AnimatedExploreBanner().fadeInUp(index: 2),
+
+            AppSpacing.vLg,
 
             Padding(
               padding: AppSpacing.screenH,
@@ -222,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-            ).fadeInUp(index: 4),
+            ).fadeInUp(index: 5),
 
             AppSpacing.vXxl,
 
@@ -655,5 +662,104 @@ class _BlogCard extends StatelessWidget {
         ),
       ),
     ).fadeInUp(index: index + 9);
+  }
+}
+
+// ==================== ANIMATED EXPLORE BANNER ====================
+class _AnimatedExploreBanner extends StatefulWidget {
+  const _AnimatedExploreBanner();
+
+  @override
+  State<_AnimatedExploreBanner> createState() => _AnimatedExploreBannerState();
+}
+
+class _AnimatedExploreBannerState extends State<_AnimatedExploreBanner> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return GestureDetector(
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SuperAppHubScreen())),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF1E293B), // Premium dark border slate
+                  Color.lerp(const Color(0xFF1E293B), const Color(0xFF38BDF8), _controller.value * 0.2)!, // Breathing neon blue accent
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Color.lerp(Colors.white10, const Color(0xFF38BDF8).withValues(alpha: 0.6), _controller.value)!,
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF38BDF8).withValues(alpha: 0.15 * _controller.value),
+                  blurRadius: 20 * _controller.value,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF38BDF8).withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Iconsax.category_2, color: Color(0xFF7DD3FC), size: 24),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Explore 50+ Top Features",
+                        style: AppTextStyles.titleMedium.copyWith(color: Colors.white),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Open Super App Hub • AI, AR & More",
+                        style: AppTextStyles.labelSmall.copyWith(color: const Color(0xFF94A3B8)),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                   padding: const EdgeInsets.all(8),
+                   decoration: BoxDecoration(
+                     color: Colors.white.withValues(alpha: 0.1), 
+                     shape: BoxShape.circle
+                   ),
+                   child: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+    );
   }
 }

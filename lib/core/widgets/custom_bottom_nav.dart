@@ -17,36 +17,56 @@ class CustomBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 24,
-            offset: const Offset(0, -8),
-          ),
-        ],
+    // Lấy padding dưới của thiết bị (an toàn cho thanh điều hướng iOS/Android)
+    final bottomPadding = MediaQuery.paddingOf(context).bottom;
+
+    return Padding(
+      // Cách lề dưới ít lại: chỉ cộng thêm một khoảng nhỏ (ví dụ 4px) trên vùng an toàn
+      padding: EdgeInsets.fromLTRB(
+        24,
+        0,
+        24,
+        bottomPadding > 0 ? bottomPadding + 4 : 12,
       ),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.85),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-              border: Border(
-                top: BorderSide(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(32),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 32,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(32),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    // Giảm alpha xuống để độ trong suốt (nhìn xuyên thấu) rõ ràng hơn
+                    Colors.white.withValues(alpha: 0.65),
+                    Colors.white.withValues(alpha: 0.35),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(32),
+                border: Border.all(
                   color: Colors.white.withValues(alpha: 0.5),
-                  width: 0.5,
+                  width: 1.0,
                 ),
               ),
-            ),
-            child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 child: SizedBox(
-                  height: 58,
+                  height: 56,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -65,9 +85,10 @@ class CustomBottomNav extends StatelessWidget {
                         isActive: currentIndex == 1,
                         onTap: () => onTap(1),
                       ),
-                      _CenterNavItem(
+                      _NavItem(
                         icon: Iconsax.add_square,
                         activeIcon: Iconsax.add_square,
+                        label: 'Create',
                         isActive: currentIndex == 2,
                         onTap: () => onTap(2),
                       ),
@@ -126,15 +147,12 @@ class _NavItem extends StatelessWidget {
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
               transitionBuilder: (child, animation) {
-                return ScaleTransition(
-                  scale: animation,
-                  child: child,
-                );
+                return ScaleTransition(scale: animation, child: child);
               },
               child: Icon(
                 isActive ? activeIcon : icon,
                 key: ValueKey<bool>(isActive),
-                color: isActive ? AppColors.primary : AppColors.textTertiary,
+                color: isActive ? AppColors.primary : Colors.black54,
                 size: 24,
               ),
             ),
@@ -144,7 +162,7 @@ class _NavItem extends StatelessWidget {
               style: TextStyle(
                 fontSize: isActive ? 10 : 9,
                 fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                color: isActive ? AppColors.primary : AppColors.textTertiary,
+                color: isActive ? AppColors.primary : Colors.black54,
               ),
               child: Text(label),
             ),
@@ -155,60 +173,3 @@ class _NavItem extends StatelessWidget {
   }
 }
 
-class _CenterNavItem extends StatelessWidget {
-  final IconData icon;
-  final IconData activeIcon;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _CenterNavItem({
-    required this.icon,
-    required this.activeIcon,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutCubic,
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: isActive ? AppColors.primaryGradient : null,
-          color: isActive ? null : Colors.grey.shade100,
-          boxShadow: isActive
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.35),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                  BoxShadow(
-                    color: AppColors.primaryLight.withValues(alpha: 0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 250),
-          transitionBuilder: (child, animation) {
-            return ScaleTransition(scale: animation, child: child);
-          },
-          child: Icon(
-            isActive ? activeIcon : icon,
-            key: ValueKey<bool>(isActive),
-            color: isActive ? Colors.white : AppColors.textTertiary,
-            size: 24,
-          ),
-        ),
-      ),
-    );
-  }
-}

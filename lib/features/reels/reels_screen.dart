@@ -23,7 +23,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
   final List<Map<String, dynamic>> _localReels = [
     {
       'id': '1',
-      'thumbnail': 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=800&auto=format&fit=crop',
+      'thumbnail': 'https://images.unsplash.com/photo-1540611025311-01df3cef54b5?w=800',
       'user': 'Huy Tran',
       'userAvatar': MockData.avatar1,
       'caption': 'Lost in the beauty of Ha Long Bay 🌊 Mọi người nhớ đến đây nhé!',
@@ -35,7 +35,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
     },
     {
       'id': '2',
-      'thumbnail': 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=800&auto=format&fit=crop',
+      'thumbnail': 'https://images.unsplash.com/photo-1528127269322-539801943592?w=800',
       'user': 'Ngan Chau',
       'userAvatar': MockData.avatar2,
       'caption': 'Hoi An nights are pure magic ✨🏮 #hoian #lantern',
@@ -47,7 +47,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
     },
     {
       'id': '3',
-      'thumbnail': 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?q=80&w=800&auto=format&fit=crop',
+      'thumbnail': 'https://images.unsplash.com/photo-1533050487297-09b450131914?w=800',
       'user': 'Tuan Nguyen',
       'userAvatar': MockData.avatar3,
       'caption': 'Da Nang vibes with the best squad 🏖️',
@@ -230,7 +230,7 @@ class _ReelItemState extends State<_ReelItem> with SingleTickerProviderStateMixi
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2),
                     image: const DecorationImage(
-                      image: CachedNetworkImageProvider('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=256&auto=format&fit=crop'), // Music disk
+                      image: CachedNetworkImageProvider('https://images.unsplash.com/photo-1553531384-cc64ac80f931?w=800'), // Music disk
                       fit: BoxFit.cover,
                     ),
                   ),

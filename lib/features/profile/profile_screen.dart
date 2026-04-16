@@ -67,7 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                       right: 0,
                       height: 200,
                       child: CachedNetworkImage(
-                        imageUrl: 'https://images.unsplash.com/photo-1546272989-40c92939c6c2?q=80&w=1200&auto=format&fit=crop', // Halong Bay Cover
+                        imageUrl: 'https://images.unsplash.com/photo-1540611025311-01df3cef54b5?w=800', // Halong Bay Cover
                         fit: BoxFit.cover,
                       ),
                     ),

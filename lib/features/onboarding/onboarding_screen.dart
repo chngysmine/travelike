@@ -24,17 +24,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       'title': 'Discover Vietnam',
       'desc': 'Explore hidden gems, majestic landscapes, and breathtaking views across the country.',
-      'image': 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=800&auto=format&fit=crop', // Halong Bay
+      'image': 'https://images.unsplash.com/photo-1540611025311-01df3cef54b5?w=800', // Halong Bay
     },
     {
       'title': 'Taste the Culture',
       'desc': 'Indulge in authentic Vietnamese cuisine and discover flavors that tell a story.',
-      'image': 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?q=80&w=800&auto=format&fit=crop', // Pho
+      'image': 'https://images.unsplash.com/photo-1528127269322-539801943592?w=800', // Pho
     },
     {
       'title': 'Seamless Travel',
       'desc': 'Book flights, hotels, and tours all in one place with a single tap.',
-      'image': 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=800&auto=format&fit=crop', // Hoi An
+      'image': 'https://images.unsplash.com/photo-1533050487297-09b450131914?w=800', // Hoi An
     },
   ];
 

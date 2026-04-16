@@ -27,27 +27,27 @@ class _LocalDishupScreenState extends State<LocalDishupScreen> {
   final List<Map<String, dynamic>> _localFoods = [
     {
       'id': '1', 'name': 'Phở Bò Mộc', 'category': 'Noodles', 'rating': 4.9, 'reviews': 512, 'price': 3.5,
-      'image': 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?q=80&w=600&auto=format&fit=crop',
+      'image': 'https://images.unsplash.com/photo-1540611025311-01df3cef54b5?w=800',
     },
     {
       'id': '2', 'name': 'Bánh Mì Hội An', 'category': 'Street Food', 'rating': 4.8, 'reviews': 890, 'price': 1.5,
-      'image': 'https://images.unsplash.com/photo-1600688640154-9619e002df30?q=80&w=600&auto=format&fit=crop',
+      'image': 'https://images.unsplash.com/photo-1528127269322-539801943592?w=800',
     },
     {
       'id': '3', 'name': 'Cà Phê Trứng', 'category': 'Drinks', 'rating': 4.7, 'reviews': 324, 'price': 2.0,
-      'image': 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=600&auto=format&fit=crop',
+      'image': 'https://images.unsplash.com/photo-1533050487297-09b450131914?w=800',
     },
     {
       'id': '4', 'name': 'Gỏi Cuốn', 'category': 'Street Food', 'rating': 4.6, 'reviews': 412, 'price': 2.5,
-      'image': 'https://images.unsplash.com/photo-1562967916-eb82221dfb92?q=80&w=600&auto=format&fit=crop',
+      'image': 'https://images.unsplash.com/photo-1553531384-cc64ac80f931?w=800',
     },
     {
       'id': '5', 'name': 'Bún Chả Hà Nội', 'category': 'Noodles', 'rating': 4.9, 'reviews': 678, 'price': 4.0,
-      'image': 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?q=80&w=600&auto=format&fit=crop',
+      'image': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800',
     },
     {
       'id': '6', 'name': 'Chè Khúc Bạch', 'category': 'Desserts', 'rating': 4.5, 'reviews': 120, 'price': 1.8,
-      'image': 'https://images.unsplash.com/photo-1551024506-0bccd828d307?q=80&w=600&auto=format&fit=crop',
+      'image': 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800',
     },
   ];
 
